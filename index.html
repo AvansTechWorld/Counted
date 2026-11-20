@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1E2A3A">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Count It</title>
+<style>
+:root{--ink:#1E2A3A;--ink2:#2B3B50;--hi:#FFD23F;--bg:#F2F4F7;--card:#fff;--line:#D9DEE6;--tx:#1E2A3A;--mut:#66758A;--ok:#1F8A5F;--bad:#C93C3C}
+@media(prefers-color-scheme:dark){:root{--bg:#121A25;--card:#1B2636;--line:#2E3D52;--tx:#EAF0F7;--mut:#94A3B8}}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(68px + env(safe-area-inset-bottom))}
+header{background:var(--ink);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
+header h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.3px;flex:1}
+header svg{width:32px;height:32px;filter:drop-shadow(0 1px 0 #0008)}
+main{max-width:720px;margin:0 auto;padding:14px}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav button{flex:1;background:none;border:0;color:#9FB0C6;padding:12px 4px;font:600 13px inherit;font-family:inherit;border-top:3px solid transparent}
+nav button.on{color:#fff;border-top-color:var(--hi)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
+.row{display:flex;align-items:center;gap:10px}.grow{flex:1;min-width:0}
+.mut{color:var(--mut);font-size:13px}.b{font-weight:700}
+input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--tx)}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+button.btn{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:11px 16px;font:700 15px inherit;font-family:inherit}
+button.hi{background:var(--hi);color:var(--ink)}button.ghost{background:none;color:var(--tx);border:1px solid var(--line)}
+button.bad{background:var(--bad)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--hi);outline-offset:1px}
+.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--line);color:var(--tx)}
+.low{background:#FFE9B0;color:#6B4B00}.pos{color:var(--ok)}.neg{color:var(--bad)}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper button{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:22px;font-weight:700}
+.stepper input{width:70px;text-align:center;font-size:20px;font-weight:800;padding:8px 4px;font-variant-numeric:tabular-nums}
+.done{border-left:5px solid var(--ok)}.todo{border-left:5px solid var(--line)}
+.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--hi)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
+.stats div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
+.stats b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}
+.scroll{overflow-x:auto}
+dialog{border:0;border-radius:12px;padding:16px;width:min(92vw,460px);background:var(--card);color:var(--tx)}
+dialog::backdrop{background:#0008}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;z-index:20;border:1px solid var(--hi)}
+.empty{text-align:center;padding:30px 10px;color:var(--mut)}
+.fab{position:fixed;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--hi);color:var(--ink);border:0;font-size:30px;font-weight:700;z-index:4;box-shadow:0 3px 10px #0004}
+details.loc{margin-bottom:12px}
+details.loc>summary,.lochead{background:var(--ink2);color:#fff;padding:10px 12px;border-radius:8px;font-weight:800;cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center}
+.lochead{margin:14px 0 6px;cursor:default}
+details.loc>summary::-webkit-details-marker{display:none}
+details.loc>summary::before{content:"▾";color:var(--hi)}details.loc:not([open])>summary::before{content:"▸"}
+details.loc>summary .mut,.lochead .mut{color:#B8C4D4;font-weight:400;margin-left:auto}
+.sec{font-weight:700;color:var(--mut);margin:12px 0 6px 4px;padding-left:8px;border-left:4px solid var(--hi);display:flex}
+.sec .mut{margin-left:auto}
+video{width:100%;border-radius:8px;background:#000}
+
+/* ---- bevelled surfaces ---- */
+:root{--hl:rgba(255,255,255,.75);--sh:rgba(20,35,60,.16)}
+@media(prefers-color-scheme:dark){:root{--hl:rgba(255,255,255,.09);--sh:rgba(0,0,0,.5)}}
+header{background:linear-gradient(#34475F,#1E2A3A);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 2px 0 #0F1721}
+nav{background:linear-gradient(#2B3B50,#1E2A3A);box-shadow:inset 0 2px 0 rgba(255,255,255,.18),0 -2px 0 #0F1721}
+nav button.on{background:linear-gradient(#17212E,#1E2A3A);box-shadow:inset 0 3px 6px rgba(0,0,0,.45)}
+.card,.stats div{box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh),0 1px 2px rgba(0,0,0,.1);border-color:var(--line)}
+.card{background:linear-gradient(var(--card),var(--card))}
+input,select,textarea{box-shadow:inset 0 2px 3px var(--sh),inset 0 -1px 0 var(--hl)}
+button.btn{background:linear-gradient(#3A4F6B,#1E2A3A);border:1px solid #0F1721;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -3px 0 rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.25)}
+button.btn.hi{background:linear-gradient(#FFE585,#FFC61A);color:#1E2A3A;border-color:#A67C00;box-shadow:inset 0 1px 0 #FFF6C2,inset 0 -3px 0 rgba(150,105,0,.6),0 1px 2px rgba(0,0,0,.25)}
+button.btn.ghost{background:linear-gradient(var(--card),var(--bg));color:var(--tx);border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh)}
+button.btn.bad{background:linear-gradient(#E26A6A,#B03030);border-color:#7E1F1F;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.35)}
+button.btn:active,.stepper button:active,.fab:active{transform:translateY(1px);box-shadow:inset 0 3px 6px rgba(0,0,0,.4)}
+.stepper button{background:linear-gradient(var(--card),var(--bg));box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh)}
+.fab{background:linear-gradient(#FFE585,#FFC61A);border:1px solid #A67C00;box-shadow:inset 0 1px 0 #FFF6C2,inset 0 -4px 0 rgba(150,105,0,.6),0 3px 8px rgba(0,0,0,.35)}
+details.loc>summary,.lochead{background:linear-gradient(#34475F,#26364B);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 0 rgba(0,0,0,.35)}
+.bar{box-shadow:inset 0 2px 3px rgba(0,0,0,.25)}.bar i{background:linear-gradient(#FFE585,#FFC61A);box-shadow:inset 0 1px 0 #FFF6C2,inset 0 -2px 0 rgba(150,105,0,.5)}
+.tag{box-shadow:inset 0 1px 0 var(--hl),inset 0 -1px 0 var(--sh)}
+dialog{box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh),0 10px 30px rgba(0,0,0,.4);border:1px solid var(--line)}
+.toast{box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.4)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<header>
+<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bv" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#FFF1A6"/><stop offset=".28" stop-color="#FFF1A6"/><stop offset=".28" stop-color="#FFD23F"/><stop offset=".7" stop-color="#FFD23F"/><stop offset=".7" stop-color="#B98A00"/><stop offset="1" stop-color="#B98A00"/></linearGradient></defs><polygon points="6,28 11.2,28 11.2,4 6,4" fill="url(#bv)"/><polygon points="16,28 21.2,28 29.2,5 24,5" fill="url(#bv)"/></svg>
+<h1>Count It</h1><button class="btn hi" id="install" hidden>Install</button>
+</header>
+<main id="main"></main>
+<nav id="nav"></nav>
+<dialog id="dlg"></dialog>
+<script>
+const KEY='countit.v1',$=s=>document.querySelector(s);
+let db=JSON.parse(localStorage.getItem(KEY)||'null')||{items:[],sessions:[],blind:true,cur:null};
+let tab='count',q='',loc='',viewSes=null,stream=null;
+const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const n=parseFloat(v);return isNaN(n)?0:n};
+const fmt=n=>(Math.round(n*100)/100).toLocaleString();
+function toast(m){document.querySelectorAll('.toast').forEach(x=>x.remove());const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),2200)}
+const sess=id=>db.sessions.find(s=>s.id===id);
+const item=id=>db.items.find(i=>i.id===id);
+db.struct=db.struct||{};
+function sync(){db.items.forEach(i=>{i.loc=i.loc||'Unassigned';i.cat=i.cat||'General';db.struct[i.loc]=db.struct[i.loc]||[];if(!db.struct[i.loc].includes(i.cat))db.struct[i.loc].push(i.cat)});save()}
+const locs=()=>Object.keys(db.struct);
+const secs=l=>db.struct[l]||[];
+function group(arr,L=x=>x.loc,S=x=>x.cat){const out=[];locs().forEach(l=>{const sl=[];secs(l).forEach(s=>{const r=arr.filter(x=>L(x)===l&&S(x)===s);if(r.length)sl.push([s,r])});if(sl.length)out.push([l,sl])});return out}
+function locSel(el,v){el.innerHTML=locs().map(l=>`<option ${l===v?'selected':''}>${esc(l)}</option>`).join('')+'<option value="__new">＋ New location…</option>'}
+function secSel(el,l,v){el.innerHTML=secs(l).map(s=>`<option ${s===v?'selected':''}>${esc(s)}</option>`).join('')+'<option value="__new">＋ New section…</option>'}
+sync();
+
+/* ---------- Report math ---------- */
+function report(s){
+  const rows=[];
+  const ids=s.status==='closed'?Object.keys(s.snap):db.items.filter(i=>(!s.loc||i.loc===s.loc)&&(!s.sec||i.cat===s.sec)).map(i=>i.id);
+  ids.forEach(id=>{
+    const it=item(id)||{},sn=s.snap&&s.snap[id];
+    const exp=sn?sn.exp:num(it.qty),cost=sn?sn.cost:num(it.cost);
+    const cnt=s.counts[id];const counted=cnt!==undefined;
+    const diff=counted?cnt-exp:null;
+    rows.push({id,loc:sn?sn.loc:it.loc,sec:sn?sn.sec:it.cat,name:sn?sn.name:it.name,sku:sn?sn.sku:it.sku,exp,cnt,counted,diff,val:counted?diff*cost:0});
+  });
+  return rows;
+}
+function totals(rows){
+  const c=rows.filter(r=>r.counted);
+  return{total:rows.length,counted:c.length,match:c.filter(r=>r.diff===0).length,
+    over:c.filter(r=>r.diff>0).length,short:c.filter(r=>r.diff<0).length,val:c.reduce((a,r)=>a+r.val,0)};
+}
+
+/* ---------- Render ---------- */
+function nav(){
+  const t=[['count','Count'],['items','Items'],['reports','Reports'],['settings','Settings']];
+  $('#nav').innerHTML=t.map(([k,l])=>`<button data-tab="${k}" class="${tab===k?'on':''}">${l}</button>`).join('');
+}
+function render(){nav();({count:rCount,items:rItems,reports:rReports,settings:rSettings})[tab]();}
+
+function itemCard(i){return `<div class="card row" data-edit="${i.id}"><div class="grow"><div class="b">${esc(i.name)}</div><div class="mut">${esc(i.sku||'No SKU')}</div></div>
+  ${i.min&&num(i.qty)<=num(i.min)?'<span class="tag low">Low</span>':''}<div class="b" style="font-size:20px">${fmt(num(i.qty))} <span class="mut">${esc(i.unit||'')}</span></div></div>`}
+function rItems(){
+  const list=db.items.filter(i=>!q||(i.name+i.sku+i.cat+i.loc).toLowerCase().includes(q.toLowerCase()));
+  const low=db.items.filter(i=>i.min&&num(i.qty)<=num(i.min)).length;
+  const val=db.items.reduce((a,i)=>a+num(i.qty)*num(i.cost),0);
+  const g=group(list);
+  $('#main').innerHTML=`
+  <div class="stats"><div><b>${db.items.length}</b><span class="mut">Items</span></div><div><b>${low}</b><span class="mut">Low stock</span></div><div><b>${fmt(val)}</b><span class="mut">Stock value</span></div></div>
+  <div class="row" style="margin-bottom:10px"><input id="q" type="search" placeholder="Search items" value="${esc(q)}"><button class="btn ghost" data-act="manage" style="white-space:nowrap">Locations</button></div>
+  ${g.length?g.map(([l,sl])=>`<details class="loc" open><summary>${esc(l)}<span class="mut">${sl.reduce((a,x)=>a+x[1].length,0)} items</span></summary>
+  ${sl.map(([s,r])=>`<div class="sec">${esc(s)}<span class="mut">${r.length}</span></div>${r.map(itemCard).join('')}`).join('')}</details>`).join(''):
+  `<div class="empty">${q?'No matching items.':'No items yet.<br>Tap + to add one, set up your locations with the Locations button, or load sample items in Settings.'}</div>`}
+  <button class="fab" data-act="add" aria-label="Add item">+</button>`;
+  const qi=$('#q');qi.oninput=()=>{q=qi.value;const p=qi.selectionStart;rItems();const n=$('#q');n.focus();n.setSelectionRange(p,p)};
+}
+
+function itemForm(id){
+  if(!locs().length){db.struct['Main store']=['General'];save()}
+  const i=id?item(id):{name:'',sku:'',cat:'',loc:'',unit:'pcs',qty:0,min:0,cost:0};
+  const d=$('#dlg');
+  d.innerHTML=`<h3 style="margin-top:0">${id?'Edit item':'Add item'}</h3>
+  <label>Name</label><input id="f_name" value="${esc(i.name)}">
+  <div class="row"><div class="grow"><label>Location</label><select id="f_loc"></select></div><div class="grow"><label>Section</label><select id="f_cat"></select></div></div>
+  <div class="row"><div class="grow"><label>SKU / barcode</label><input id="f_sku" value="${esc(i.sku)}"></div><div class="grow"><label>Unit</label><input id="f_unit" value="${esc(i.unit)}"></div></div>
+  <div class="row"><div class="grow"><label>In stock</label><input id="f_qty" type="number" inputmode="decimal" value="${i.qty}"></div><div class="grow"><label>Reorder at</label><input id="f_min" type="number" inputmode="decimal" value="${i.min}"></div><div class="grow"><label>Unit cost</label><input id="f_cost" type="number" inputmode="decimal" value="${i.cost}"></div></div>
+  <div class="row" style="margin-top:16px">${id?'<button class="btn bad" id="f_del">Delete</button>':''}<span class="grow"></span><button class="btn ghost" id="f_x">Cancel</button><button class="btn hi" id="f_ok">Save item</button></div>`;
+  const fl=$('#f_loc'),fc=$('#f_cat');
+  locSel(fl,i.loc||(loc&&db.struct[loc]?loc:locs()[0]));secSel(fc,fl.value,i.cat);
+  fl.onchange=()=>{if(fl.value==='__new'){const n=(prompt('New location name')||'').trim();if(n&&!db.struct[n]){db.struct[n]=['General'];save()}locSel(fl,n||locs()[0])}secSel(fc,fl.value)};
+  fc.onchange=()=>{if(fc.value==='__new'){const n=(prompt('New section name')||'').trim();if(n&&!secs(fl.value).includes(n)){db.struct[fl.value].push(n);save()}secSel(fc,fl.value,n||secs(fl.value)[0])}};
+  d.showModal();
+  $('#f_x').onclick=()=>d.close();
+  if(id)$('#f_del').onclick=()=>{if(confirm('Delete this item?')){db.items=db.items.filter(x=>x.id!==id);save();d.close();render()}};
+  $('#f_ok').onclick=()=>{
+    const name=$('#f_name').value.trim();if(!name)return toast('Enter an item name');
+    const sku=$('#f_sku').value.trim();
+    if(sku&&db.items.some(x=>x.sku===sku&&x.id!==id))return toast('That SKU is already used');
+    const o={name,sku,unit:$('#f_unit').value.trim(),cat:fc.value,loc:fl.value,qty:num($('#f_qty').value),min:num($('#f_min').value),cost:num($('#f_cost').value)};
+    if(id)Object.assign(item(id),o);else db.items.push({id:uid(),...o});
+    save();d.close();render();toast('Item saved');
+  };
+}
+
+function manage(){
+  const d=$('#dlg'),L=locs();
+  const n=(l,s)=>db.items.filter(i=>i.loc===l&&(s===undefined||i.cat===s)).length;
+  d.innerHTML=`<h3 style="margin-top:0">Locations and sections</h3>
+  ${L.map((l,a)=>`<div class="card"><div class="row"><div class="grow b">${esc(l)} <span class="mut">${n(l)} items</span></div><button class="btn ghost" data-m="rl" data-a="${a}">Rename</button><button class="btn ghost" data-m="dl" data-a="${a}">Delete</button></div>
+  ${secs(l).map((s,b)=>`<div class="row" style="margin-top:8px;padding-left:10px"><div class="grow">${esc(s)} <span class="mut">${n(l,s)}</span></div><button class="btn ghost" data-m="rs" data-a="${a}" data-b="${b}">Rename</button><button class="btn ghost" data-m="ds" data-a="${a}" data-b="${b}">Delete</button></div>`).join('')}
+  <button class="btn ghost" data-m="as" data-a="${a}" style="margin-top:10px">Add section</button></div>`).join('')||'<p class="mut">No locations yet.</p>'}
+  <div class="row"><button class="btn hi" data-m="al">Add location</button><span class="grow"></span><button class="btn ghost" data-m="done">Done</button></div>`;
+  if(!d.open)d.showModal();
+  d.onclick=e=>{const t=e.target.closest('[data-m]');if(!t)return;
+    const m=t.dataset.m,l=L[t.dataset.a],s=l&&secs(l)[t.dataset.b];
+    const ask=(m,v)=>(prompt(m,v||'')||'').trim();
+    if(m==='done'){d.onclick=null;d.close();return render()}
+    if(m==='al'){const x=ask('Location name');if(x&&!db.struct[x])db.struct[x]=['General'];else if(x)toast('Already exists')}
+    if(m==='as'){const x=ask('Section name');if(x&&!secs(l).includes(x))db.struct[l].push(x)}
+    if(m==='rl'){const x=ask('Rename location',l);if(x&&x!==l&&!db.struct[x]){db.struct=Object.fromEntries(Object.entries(db.struct).map(([k,v])=>[k===l?x:k,v]));db.items.forEach(i=>{if(i.loc===l)i.loc=x});db.sessions.forEach(z=>{if(z.loc===l)z.loc=x})}}
+    if(m==='rs'){const x=ask('Rename section',s);if(x&&x!==s&&!secs(l).includes(x)){db.struct[l][t.dataset.b]=x;db.items.forEach(i=>{if(i.loc===l&&i.cat===s)i.cat=x});db.sessions.forEach(z=>{if(z.loc===l&&z.sec===s)z.sec=x})}}
+    if(m==='dl'){if(n(l))toast('Move or delete its items first');else if(confirm('Delete location '+l+'?'))delete db.struct[l]}
+    if(m==='ds'){if(n(l,s))toast('Move or delete its items first');else if(confirm('Delete section '+s+'?'))db.struct[l].splice(t.dataset.b,1)}
+    save();manage();
+  };
+}
+
+function rCount(){
+  const open=db.sessions.filter(s=>s.status==='open');
+  if(!open.length){
+    $('#main').innerHTML=`<div class="card"><h3 style="margin-top:0">Start a stock take</h3>
+    <label>Name</label><input id="s_name" value="Count ${new Date().toLocaleDateString()}">
+    <label>Location</label><select id="s_loc"></select>
+    <label>Section</label><select id="s_sec"></select>
+    <button class="btn hi" data-act="newses" style="margin-top:14px;width:100%" ${db.items.length?'':'disabled'}>Start counting</button>
+    ${db.items.length?'':'<p class="mut">Add items first in the Items tab.</p>'}</div>`;
+    const sl=$('#s_loc'),ss=$('#s_sec');
+    const fillS=()=>{ss.innerHTML='<option value="">All sections</option>'+(sl.value?secs(sl.value).map(s=>`<option>${esc(s)}</option>`).join(''):'')};
+    sl.innerHTML='<option value="">All locations</option>'+locs().map(l=>`<option>${esc(l)}</option>`).join('');fillS();sl.onchange=fillS;return;
+  }
+  if(!sess(db.cur)||sess(db.cur).status!=='open')db.cur=open[0].id;
+  const s=sess(db.cur),rows=report(s),t=totals(rows);
+  const list=rows.filter(r=>!q||(r.name+r.sku+r.sec+r.loc).toLowerCase().includes(q.toLowerCase()));
+  const pct=t.total?Math.round(t.counted/t.total*100):0;
+  const rowH=r=>{const el=r.counted;return `<div class="card row ${el?'done':'todo'}" id="r_${r.id}"><div class="grow"><div class="b">${esc(r.name)}</div><div class="mut">${esc(r.sku||'')}${!db.blind||el?` · system ${fmt(r.exp)}`:''}${el&&r.diff?` · <span class="${r.diff>0?'pos':'neg'}">${r.diff>0?'+':''}${fmt(r.diff)}</span>`:''}</div></div>
+  <div class="stepper"><button data-dec="${r.id}" aria-label="Minus one">−</button><input data-cnt="${r.id}" type="number" inputmode="decimal" placeholder="–" value="${el?r.cnt:''}"><button data-inc="${r.id}" aria-label="Plus one">+</button></div></div>`};
+  const g=group(list,r=>r.loc,r=>r.sec);
+  $('#main').innerHTML=`
+  ${open.length>1?`<select id="pick" style="margin-bottom:10px">${open.map(o=>`<option value="${o.id}" ${o.id===s.id?'selected':''}>${esc(o.name)}</option>`).join('')}</select>`:''}
+  <div class="card"><div class="row"><div class="grow b">${esc(s.name)}${s.loc?` <span class="tag">${esc(s.loc)}${s.sec?' / '+esc(s.sec):''}</span>`:''}</div><div class="b">${t.counted}/${t.total}</div></div>
+  <div class="bar" style="margin:8px 0"><i style="width:${pct}%"></i></div>
+  <div class="row"><button class="btn ghost" data-act="finish" style="flex:1">Review &amp; finish</button><button class="btn ghost" data-act="newses2">New</button></div></div>
+  <div class="row" style="margin-bottom:10px"><input id="scan" placeholder="Scan or type SKU, press Enter" enterkeyhint="done"><button class="btn hi" data-act="cam" id="camBtn" ${'BarcodeDetector' in window?'':'hidden'}>Scan</button></div>
+  <input id="q" type="search" placeholder="Find item" value="${esc(q)}" style="margin-bottom:6px">
+  ${g.map(([l,sl])=>`<div class="lochead">${esc(l)}<span class="mut">${sl.reduce((a,x)=>a+x[1].filter(r=>r.counted).length,0)}/${sl.reduce((a,x)=>a+x[1].length,0)}</span></div>${sl.map(([sc,r])=>`<div class="sec">${esc(sc)}<span class="mut">${r.filter(x=>x.counted).length}/${r.length}</span></div>${r.map(rowH).join('')}`).join('')}`).join('')||'<div class="empty">No matching items.</div>'}`;
+  const qi=$('#q');qi.oninput=()=>{q=qi.value;const p=qi.selectionStart;rCount();const n=$('#q');n.focus();n.setSelectionRange(p,p)};
+  $('#scan').onkeydown=e=>{if(e.key==='Enter'){onCode(e.target.value.trim());e.target.value=''}};
+  const pk=$('#pick');if(pk)pk.onchange=()=>{db.cur=pk.value;save();rCount()};
+}
+function setCount(id,v){const s=sess(db.cur);if(v===null)delete s.counts[id];else s.counts[id]=Math.max(0,v);save()}
+function onCode(code){
+  if(!code)return;const s=sess(db.cur);
+  const it=db.items.find(i=>i.sku===code);
+  if(!it)return toast('No item with SKU '+code);
+  if((s.loc&&it.loc!==s.loc)||(s.sec&&it.cat!==s.sec))return toast('Not in this count: '+it.name);
+  setCount(it.id,(s.counts[it.id]||0)+1);q='';rCount();
+  const el=$('#r_'+it.id);if(el)el.scrollIntoView({block:'center'});
+  toast(it.name+': '+s.counts[it.id]);
+  if(navigator.vibrate)navigator.vibrate(40);
+}
+async function camScan(){
+  const d=$('#dlg');d.innerHTML=`<video id="vid" playsinline muted></video><p class="mut" id="cs">Point at a barcode</p><button class="btn ghost" id="cx" style="width:100%">Close</button>`;d.showModal();
+  let on=true;const stop=()=>{on=false;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;d.close()};
+  $('#cx').onclick=stop;d.onclose=()=>{on=false;if(stream)stream.getTracks().forEach(t=>t.stop())};
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    const v=$('#vid');v.srcObject=stream;await v.play();
+    const det=new BarcodeDetector();let last='',lt=0;
+    const loop=async()=>{if(!on)return;
+      try{const r=await det.detect(v);if(r[0]){const c=r[0].rawValue,n=Date.now();if(c!==last||n-lt>1500){last=c;lt=n;onCode(c);$('#cs').textContent='Last: '+c}}}catch(e){}
+      setTimeout(loop,250)};loop();
+  }catch(e){$('#cs').textContent='Camera not available. Type the SKU instead.'}
+}
+function finish(){
+  const s=sess(db.cur),rows=report(s),t=totals(rows),un=t.total-t.counted;
+  const d=$('#dlg');
+  d.innerHTML=`<h3 style="margin-top:0">Finish "${esc(s.name)}"</h3>
+  <div class="stats"><div><b>${t.match}</b><span class="mut">Match</span></div><div><b class="pos">${t.over}</b><span class="mut">Over</span></div><div><b class="neg">${t.short}</b><span class="mut">Short</span></div></div>
+  <p>Value difference: <b class="${t.val<0?'neg':'pos'}">${fmt(t.val)}</b></p>
+  ${un?`<p class="mut">${un} item${un>1?'s':''} not counted yet. They will stay as they are.</p>`:''}
+  <label style="display:flex;gap:10px;align-items:center;color:var(--tx)"><input type="checkbox" id="apply" checked style="width:auto"> Update stock levels to the counted quantities</label>
+  <div class="row" style="margin-top:16px"><span class="grow"></span><button class="btn ghost" id="fx">Keep counting</button><button class="btn hi" id="fok">Close count</button></div>`;
+  d.showModal();$('#fx').onclick=()=>d.close();
+  $('#fok').onclick=()=>{
+    s.snap={};rows.forEach(r=>{const it=item(r.id)||{};s.snap[r.id]={loc:r.loc,sec:r.sec,name:r.name,sku:r.sku,exp:r.exp,cost:num(it.cost)}});
+    if($('#apply').checked)rows.forEach(r=>{if(r.counted)item(r.id).qty=r.cnt});
+    s.applied=$('#apply').checked;s.status='closed';s.closed=Date.now();db.cur=null;save();d.close();
+    viewSes=s.id;tab='reports';render();toast('Count closed');
+  };
+}
+
+function rReports(){
+  if(viewSes&&sess(viewSes)){
+    const s=sess(viewSes),rows=report(s),t=totals(rows);
+    $('#main').innerHTML=`<button class="btn ghost" data-act="back">Back</button>
+    <h3>${esc(s.name)} <span class="tag">${s.status}</span></h3>
+    <div class="stats"><div><b>${t.counted}/${t.total}</b><span class="mut">Counted</span></div><div><b>${t.over+t.short}</b><span class="mut">Variances</span></div><div><b class="${t.val<0?'neg':'pos'}">${fmt(t.val)}</b><span class="mut">Value diff</span></div></div>
+    <div class="row" style="margin-bottom:10px"><button class="btn hi" data-act="csvses">Export CSV</button><button class="btn bad" data-act="delses">Delete</button></div>
+    <div class="card scroll"><table><tr><th>Item</th><th>System</th><th>Counted</th><th>Diff</th></tr>
+    ${rows.sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).map(r=>`<tr><td>${esc(r.name)}<div class="mut">${esc(r.loc)} / ${esc(r.sec)}</div></td><td>${fmt(r.exp)}</td><td>${r.counted?fmt(r.cnt):'–'}</td><td class="${r.diff>0?'pos':r.diff<0?'neg':''}">${r.counted?(r.diff>0?'+':'')+fmt(r.diff):'–'}</td></tr>`).join('')}</table></div>`;return;
+  }
+  $('#main').innerHTML=db.sessions.length?[...db.sessions].reverse().map(s=>{const t=totals(report(s));return `<div class="card row" data-ses="${s.id}"><div class="grow"><div class="b">${esc(s.name)}</div><div class="mut">${new Date(s.created).toLocaleDateString()} · ${t.counted}/${t.total} counted · ${t.over+t.short} variances</div></div><span class="tag">${s.status}</span></div>`}).join(''):'<div class="empty">No stock takes yet. Start one in the Count tab.</div>';
+}
+
+function rSettings(){
+  $('#main').innerHTML=`
+  <div class="card"><label style="display:flex;gap:10px;align-items:center;margin:0;color:var(--tx)"><input type="checkbox" id="blind" ${db.blind?'checked':''} style="width:auto"> Blind count (hide system quantity while counting)</label></div>
+  <div class="card"><div class="b">Locations and sections</div><p class="mut">Group items by location, then by section inside each location.</p><button class="btn ghost" data-act="manage">Manage locations</button></div>
+  <div class="card"><div class="b">Items</div><div class="row" style="margin-top:8px;flex-wrap:wrap">
+  <button class="btn ghost" data-act="expitems">Export CSV</button><button class="btn ghost" data-act="impitems">Import CSV</button><button class="btn ghost" data-act="sample">Load sample items</button></div>
+  <p class="mut">CSV columns: name, sku, category (section), location, unit, qty, min, cost. New locations and sections are created automatically.</p></div>
+  <div class="card"><div class="b">Backup</div><div class="row" style="margin-top:8px"><button class="btn ghost" data-act="bk">Download backup</button><button class="btn ghost" data-act="rs">Restore backup</button></div></div>
+  <div class="card"><button class="btn bad" data-act="wipe">Erase all data</button></div>
+  <input type="file" id="file" hidden>`;
+  $('#blind').onchange=e=>{db.blind=e.target.checked;save()};
+}
+
+/* ---------- File helpers ---------- */
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type||'text/csv'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+const csvCell=v=>/[",\n]/.test(v=String(v??''))?'"'+v.replace(/"/g,'""')+'"':v;
+const toCSV=rows=>rows.map(r=>r.map(csvCell).join(',')).join('\n');
+function parseCSV(t){const out=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];
+  if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+  else if(ch==='"')q=true;else if(ch===','){r.push(c);c=''}
+  else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';if(r.some(x=>x!==''))out.push(r);r=[]}
+  else c+=ch}
+  r.push(c);if(r.some(x=>x!==''))out.push(r);return out}
+function pickFile(cb){const f=$('#file');f.value='';f.onchange=()=>{const r=new FileReader();r.onload=()=>cb(r.result);r.readAsText(f.files[0])};f.click()}
+
+/* ---------- Actions ---------- */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-tab],[data-act],[data-edit],[data-ses],[data-inc],[data-dec]');if(!t)return;
+  const D=t.dataset;
+  if(D.tab){tab=D.tab;q='';viewSes=null;return render()}
+  if(D.edit)return itemForm(D.edit);
+  if(D.ses){viewSes=D.ses;return render()}
+  if(D.inc||D.dec){const id=D.inc||D.dec,s=sess(db.cur),v=(s.counts[id]||0)+(D.inc?1:-1);setCount(id,v);return rCount()}
+  switch(D.act){
+    case'add':return itemForm();
+    case'manage':return manage();
+    case'newses':case'newses2':{
+            const nm=($('#s_name')||{}).value||'Count '+new Date().toLocaleDateString(),lc=($('#s_loc')||{}).value||'',sc=($('#s_sec')||{}).value||'';
+      const s={id:uid(),name:nm,loc:lc,sec:sc,created:Date.now(),status:'open',counts:{}};
+      if(D.act==='newses2'){const n=prompt('Name for the new count?','Count '+new Date().toLocaleDateString());if(!n)return;s.name=n}
+      db.sessions.push(s);db.cur=s.id;save();return render()}
+    case'cam':return camScan();
+    case'finish':return finish();
+    case'back':viewSes=null;return render();
+    case'delses':if(confirm('Delete this report?')){db.sessions=db.sessions.filter(s=>s.id!==viewSes);if(db.cur===viewSes)db.cur=null;viewSes=null;save();render()}return;
+    case'csvses':{const s=sess(viewSes);download(s.name.replace(/\W+/g,'_')+'.csv',toCSV([['location','section','name','sku','system','counted','diff'],...report(s).map(r=>[r.loc,r.sec,r.name,r.sku,r.exp,r.counted?r.cnt:'',r.counted?r.diff:''])]));return}
+    case'expitems':return download('count-it-items.csv',toCSV([['name','sku','category','location','unit','qty','min','cost'],...db.items.map(i=>[i.name,i.sku,i.cat,i.loc,i.unit,i.qty,i.min,i.cost])]));
+    case'impitems':return pickFile(t=>{const rows=parseCSV(t),h=rows.shift().map(x=>x.trim().toLowerCase());let n=0;
+      rows.forEach(r=>{const o={};h.forEach((k,i)=>o[k]=(r[i]||'').trim());if(!o.name)return;
+        const ex=o.sku&&db.items.find(i=>i.sku===o.sku);const v={name:o.name,sku:o.sku||'',cat:o.category||o.cat||'',loc:o.location||o.loc||'',unit:o.unit||'pcs',qty:num(o.qty),min:num(o.min),cost:num(o.cost)};
+        if(ex)Object.assign(ex,v);else db.items.push({id:uid(),...v});n++});
+      sync();toast(n+' items imported');render()});
+    case'sample':{[['Cement 50kg bag','CEM-50','Cement and sand','Shed A','bags',40,10,28],['Sharp sand 25kg','SND-25','Cement and sand','Shed A','bags',30,8,12],['Claw hammer','HAM-01','Hand tools','Shed B','pcs',12,3,35],['Tape measure 5m','TAP-05','Hand tools','Shed B','pcs',8,2,15],['Nails 75mm (1kg)','NAI-75','Fixings','Shed B','boxes',25,8,9],['Wood glue 1L','GLU-1L','Adhesives','Shed B','btl',9,4,22],['Treated timber 4x2','TMB-42','Timber','Yard','lengths',120,30,18],['Plywood 18mm','PLY-18','Sheet goods','Yard','sheets',35,10,95]]
+      .forEach(([name,sku,cat,loc,unit,qty,min,cost])=>{if(!db.items.some(i=>i.sku===sku))db.items.push({id:uid(),name,sku,cat,loc,unit,qty,min,cost})});sync();toast('Sample items added');return render()}
+    case'bk':return download('count-it-backup.json',JSON.stringify(db),'application/json');
+    case'rs':return pickFile(t=>{try{const o=JSON.parse(t);if(!o.items||!o.sessions)throw 0;db=o;db.struct=db.struct||{};sync();toast('Backup restored');render()}catch(e){toast('That file is not a Count It backup')}});
+    case'wipe':if(confirm('Erase every item and count on this device?')){db={items:[],sessions:[],blind:true,cur:null,struct:{}};save();render()}return;
+  }
+});
+document.addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.cnt;if(!id)return;
+  const v=e.target.value;setCount(id,v===''?null:num(v));rCount()});
+
+/* ---------- PWA ---------- */
+let dp;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#install').hidden=false});
+$('#install').onclick=async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;$('#install').hidden=true};
+window.addEventListener('appinstalled',()=>$('#install').hidden=true);
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+render();
+</script></body></html>
