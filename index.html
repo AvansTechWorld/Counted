@@ -1,357 +1,180 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1E2A3A">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#16223A">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" href="icons/icon-192.png"><link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>Count It</title>
 <style>
-:root{--ink:#1E2A3A;--ink2:#2B3B50;--hi:#FFD23F;--bg:#F2F4F7;--card:#fff;--line:#D9DEE6;--tx:#1E2A3A;--mut:#66758A;--ok:#1F8A5F;--bad:#C93C3C}
-@media(prefers-color-scheme:dark){:root{--bg:#121A25;--card:#1B2636;--line:#2E3D52;--tx:#EAF0F7;--mut:#94A3B8}}
-*{box-sizing:border-box}html,body{margin:0}
-body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(68px + env(safe-area-inset-bottom))}
-header{background:var(--ink);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5}
-header h1{font-size:20px;margin:0;font-weight:800;letter-spacing:-.3px;flex:1}
-header svg{width:32px;height:32px;filter:drop-shadow(0 1px 0 #0008)}
-main{max-width:720px;margin:0 auto;padding:14px}
-nav{position:fixed;bottom:0;left:0;right:0;background:var(--ink);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:5}
-nav button{flex:1;background:none;border:0;color:#9FB0C6;padding:12px 4px;font:600 13px inherit;font-family:inherit;border-top:3px solid transparent}
-nav button.on{color:#fff;border-top-color:var(--hi)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px}
-.row{display:flex;align-items:center;gap:10px}.grow{flex:1;min-width:0}
-.mut{color:var(--mut);font-size:13px}.b{font-weight:700}
-input,select,textarea{width:100%;padding:11px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--card);color:var(--tx)}
-label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
-button.btn{background:var(--ink);color:#fff;border:0;border-radius:8px;padding:11px 16px;font:700 15px inherit;font-family:inherit}
-button.hi{background:var(--hi);color:var(--ink)}button.ghost{background:none;color:var(--tx);border:1px solid var(--line)}
-button.bad{background:var(--bad)}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--hi);outline-offset:1px}
-.tag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--line);color:var(--tx)}
-.low{background:#FFE9B0;color:#6B4B00}.pos{color:var(--ok)}.neg{color:var(--bad)}
-.stepper{display:flex;align-items:center;gap:6px}
-.stepper button{width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:22px;font-weight:700}
-.stepper input{width:70px;text-align:center;font-size:20px;font-weight:800;padding:8px 4px;font-variant-numeric:tabular-nums}
-.done{border-left:5px solid var(--ok)}.todo{border-left:5px solid var(--line)}
-.bar{height:10px;background:var(--line);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--hi)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px}
-.stats div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
-.stats b{display:block;font-size:24px;font-variant-numeric:tabular-nums}
-table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}th:first-child,td:first-child{text-align:left}
-.scroll{overflow-x:auto}
-dialog{border:0;border-radius:12px;padding:16px;width:min(92vw,460px);background:var(--card);color:var(--tx)}
-dialog::backdrop{background:#0008}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;z-index:20;border:1px solid var(--hi)}
-.empty{text-align:center;padding:30px 10px;color:var(--mut)}
-.fab{position:fixed;right:16px;bottom:calc(80px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--hi);color:var(--ink);border:0;font-size:30px;font-weight:700;z-index:4;box-shadow:0 3px 10px #0004}
-details.loc{margin-bottom:12px}
-details.loc>summary,.lochead{background:var(--ink2);color:#fff;padding:10px 12px;border-radius:8px;font-weight:800;cursor:pointer;list-style:none;display:flex;gap:8px;align-items:center}
-.lochead{margin:14px 0 6px;cursor:default}
-details.loc>summary::-webkit-details-marker{display:none}
-details.loc>summary::before{content:"▾";color:var(--hi)}details.loc:not([open])>summary::before{content:"▸"}
-details.loc>summary .mut,.lochead .mut{color:#B8C4D4;font-weight:400;margin-left:auto}
-.sec{font-weight:700;color:var(--mut);margin:12px 0 6px 4px;padding-left:8px;border-left:4px solid var(--hi);display:flex}
-.sec .mut{margin-left:auto}
-video{width:100%;border-radius:8px;background:#000}
+:root{--bg:#F3F4F8;--s:#fff;--s2:#EBEEF4;--tx:#111A2C;--mut:#69758A;--ln:#E1E5ED;--ink:#16223A;--ac:#FFC61A;--ok:#0F9D6E;--bad:#E04848;--sh:0 6px 20px rgba(20,34,58,.08)}
+:root[data-theme=dark]{--bg:#0B111B;--s:#141D2C;--s2:#1D283B;--tx:#EAF0FA;--mut:#8D9BB3;--ln:#243249;--ink:#0F1828;--sh:0 6px 20px rgba(0,0,0,.4)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0B111B;--s:#141D2C;--s2:#1D283B;--tx:#EAF0FA;--mut:#8D9BB3;--ln:#243249;--ink:#0F1828;--sh:0 6px 20px rgba(0,0,0,.4)}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-bottom:calc(110px + env(safe-area-inset-bottom));overscroll-behavior-y:contain}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;touch-action:manipulation}
+header{position:sticky;top:0;z-index:6;display:flex;align-items:center;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+header svg{width:34px;height:34px}header h1{margin:0;font-size:22px;font-weight:800;letter-spacing:-.5px;flex:1}
+.ib2{width:42px;height:42px;border-radius:14px;background:var(--s2);font-size:20px;font-weight:800}
+main{max-width:640px;margin:0 auto;padding:4px 14px}
+.card{background:var(--s);border:1px solid var(--ln);border-radius:22px;padding:14px;margin-bottom:12px;box-shadow:var(--sh)}
+.row{display:flex;align-items:center;gap:10px}.grow{flex:1;min-width:0}.mut{color:var(--mut);font-size:13px}
+input,textarea,select{width:100%;padding:14px;border:1.5px solid var(--ln);border-radius:14px;font:inherit;font-size:16px;background:var(--s);color:var(--tx);outline:0;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 30%,transparent)}
+label{display:block;font-size:13px;color:var(--mut);margin:12px 0 6px;font-weight:600}
+.btn{padding:14px 18px;border-radius:16px;font-weight:700;background:var(--s2);transition:transform .12s}.btn:active,.it:active,.chip:active{transform:scale(.96)}
+.btn.p{background:var(--ink);color:#fff}.btn.ac{background:var(--ac);color:#2A1E00}.btn.bad{background:var(--bad);color:#fff}.btn.w{width:100%}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stats b{display:block;font-size:30px;font-weight:800;letter-spacing:-1px;font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:9px;background:var(--s2);margin-top:12px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);border-radius:9px;transition:width .4s}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 2px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:9px 14px;border-radius:99px;background:var(--s2);font-weight:700;font-size:14px;transition:all .2s}.chip.on{background:var(--ink);color:#fff}
+.it{display:flex;align-items:center;gap:8px;background:var(--s);border:1.5px solid var(--ln);border-radius:22px;padding:10px;margin-bottom:10px;transition:transform .12s,border-color .2s,opacity .2s}
+.it.ok{border-color:color-mix(in srgb,var(--ok) 55%,var(--ln));background:color-mix(in srgb,var(--ok) 7%,var(--s))}
+.ck{width:36px;height:36px;border-radius:50%;border:2px solid var(--ln);color:transparent;font-weight:800;flex:none;transition:all .2s}.it.ok .ck{background:var(--ok);border-color:var(--ok);color:#fff}
+.ib{flex:1;min-width:0;padding:4px 2px;cursor:pointer}.in{font-weight:700;font-size:17px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mn{width:40px;height:40px;border-radius:50%;background:var(--s2);font-size:22px;font-weight:700;flex:none}
+.nm{min-width:58px;height:48px;padding:0 8px;border-radius:15px;background:var(--s2);font-size:24px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-1px;flex:none}
+.nm.z{color:var(--bad)}.pl{width:48px;height:48px;border-radius:16px;background:var(--ac);color:#2A1E00;font-size:28px;font-weight:700;line-height:1;flex:none}
+.bump{animation:bump .26s ease-out}@keyframes bump{40%{transform:scale(1.3);background:var(--ac)}}
+.add{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--ln)}
+.add .in2{max-width:640px;margin:auto;display:flex;gap:8px}.add input{border-radius:18px}.add .btn{flex:none;border-radius:18px}
+.sw{position:fixed;inset:0;background:rgba(8,14,26,.55);backdrop-filter:blur(4px);z-index:20;display:none;align-items:flex-end;justify-content:center}.sw.on{display:flex}
+.sheet{width:min(100%,540px);max-height:92vh;overflow:auto;background:var(--s);border-radius:28px 28px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));animation:up .26s cubic-bezier(.2,.9,.3,1)}
+@keyframes up{from{transform:translateY(100%)}}.sheet h3{margin:0 0 4px;font-size:22px;letter-spacing:-.5px}
+.kv{font-size:46px!important;font-weight:800;text-align:center;letter-spacing:-2px}
+.seg{display:flex;background:var(--s2);border-radius:16px;padding:4px}.seg button{flex:1;padding:10px 4px;border-radius:12px;font-size:14px;font-weight:700;color:var(--mut)}.seg button.on{background:var(--s);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:12px 18px;border-radius:16px;z-index:30;display:flex;gap:14px;align-items:center;font-weight:600;animation:up .25s;box-shadow:0 8px 24px #0005;max-width:92vw}.toast button{color:var(--ac);font-weight:800}
+.empty{text-align:center;color:var(--mut);padding:40px 16px;line-height:1.5}.empty b{color:var(--tx);font-size:18px;display:block;margin-bottom:6px}
 
-/* ---- bevelled surfaces ---- */
-:root{--hl:rgba(255,255,255,.75);--sh:rgba(20,35,60,.16)}
-@media(prefers-color-scheme:dark){:root{--hl:rgba(255,255,255,.09);--sh:rgba(0,0,0,.5)}}
-header{background:linear-gradient(#34475F,#1E2A3A);box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 2px 0 #0F1721}
-nav{background:linear-gradient(#2B3B50,#1E2A3A);box-shadow:inset 0 2px 0 rgba(255,255,255,.18),0 -2px 0 #0F1721}
-nav button.on{background:linear-gradient(#17212E,#1E2A3A);box-shadow:inset 0 3px 6px rgba(0,0,0,.45)}
-.card,.stats div{box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh),0 1px 2px rgba(0,0,0,.1);border-color:var(--line)}
-.card{background:linear-gradient(var(--card),var(--card))}
-input,select,textarea{box-shadow:inset 0 2px 3px var(--sh),inset 0 -1px 0 var(--hl)}
-button.btn{background:linear-gradient(#3A4F6B,#1E2A3A);border:1px solid #0F1721;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -3px 0 rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.25)}
-button.btn.hi{background:linear-gradient(#FFE585,#FFC61A);color:#1E2A3A;border-color:#A67C00;box-shadow:inset 0 1px 0 #FFF6C2,inset 0 -3px 0 rgba(150,105,0,.6),0 1px 2px rgba(0,0,0,.25)}
-button.btn.ghost{background:linear-gradient(var(--card),var(--bg));color:var(--tx);border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh)}
-button.btn.bad{background:linear-gradient(#E26A6A,#B03030);border-color:#7E1F1F;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.35)}
-button.btn:active,.stepper button:active,.fab:active{transform:translateY(1px);box-shadow:inset 0 3px 6px rgba(0,0,0,.4)}
-.stepper button{background:linear-gradient(var(--card),var(--bg));box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh)}
-.fab{background:linear-gradient(#FFE585,#FFC61A);border:1px solid #A67C00;box-shadow:inset 0 1px 0 #FFF6C2,inset 0 -4px 0 rgba(150,105,0,.6),0 3px 8px rgba(0,0,0,.35)}
-details.loc>summary,.lochead{background:linear-gradient(#34475F,#26364B);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),inset 0 -2px 0 rgba(0,0,0,.35)}
-.bar{box-shadow:inset 0 2px 3px rgba(0,0,0,.25)}.bar i{background:linear-gradient(#FFE585,#FFC61A);box-shadow:inset 0 1px 0 #FFF6C2,inset 0 -2px 0 rgba(150,105,0,.5)}
-.tag{box-shadow:inset 0 1px 0 var(--hl),inset 0 -1px 0 var(--sh)}
-dialog{box-shadow:inset 0 1px 0 var(--hl),inset 0 -3px 0 var(--sh),0 10px 30px rgba(0,0,0,.4);border:1px solid var(--line)}
-.toast{box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.4)}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fc{text-align:left;background:var(--s);border:1px solid var(--ln);border-radius:22px;padding:16px;box-shadow:var(--sh);transition:transform .12s;min-width:0}.fc:active{transform:scale(.96)}
+.fd{width:36px;height:8px;border-radius:9px;background:var(--c);margin-bottom:14px}.fn{font-size:18px;font-weight:800;letter-spacing:-.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:2px}
+.fc.nw{border:2px dashed var(--ln);box-shadow:none;background:none;display:grid;place-items:center;min-height:120px;color:var(--mut);font-weight:800}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style></head><body>
-<header>
-<svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bv" x1="0" x2="1" y1="0" y2="0"><stop offset="0" stop-color="#FFF1A6"/><stop offset=".28" stop-color="#FFF1A6"/><stop offset=".28" stop-color="#FFD23F"/><stop offset=".7" stop-color="#FFD23F"/><stop offset=".7" stop-color="#B98A00"/><stop offset="1" stop-color="#B98A00"/></linearGradient></defs><polygon points="6,28 11.2,28 11.2,4 6,4" fill="url(#bv)"/><polygon points="16,28 21.2,28 29.2,5 24,5" fill="url(#bv)"/></svg>
-<h1>Count It</h1><button class="btn hi" id="install" hidden>Install</button>
-</header>
-<main id="main"></main>
-<nav id="nav"></nav>
-<dialog id="dlg"></dialog>
+<header><button class="ib2" id="back" data-act="home" hidden aria-label="All folders">‹</button><svg id="lg" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="bv" x1="0" x2="1"><stop offset="0" stop-color="#FFF1A6"/><stop offset=".28" stop-color="#FFF1A6"/><stop offset=".28" stop-color="#FFD23F"/><stop offset=".7" stop-color="#FFD23F"/><stop offset=".7" stop-color="#B98A00"/><stop offset="1" stop-color="#B98A00"/></linearGradient></defs><polygon points="6,28 11.2,28 11.2,4 6,4" fill="url(#bv)"/><polygon points="16,28 21.2,28 29.2,5 24,5" fill="url(#bv)"/></svg><h1 id="ttl" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Count It</h1><button class="btn ac" id="install" hidden>Install</button><button class="ib2" data-act="menu" aria-label="Menu">⋯</button></header>
+<main>
+<div id="home"></div>
+<div id="inv" hidden>
+<div class="card" id="st"></div>
+<input id="q" type="search" placeholder="Search items">
+<div class="chips" id="ch"></div>
+<div id="list"></div>
+</div>
+</main>
+<div class="add" id="addbar" hidden><div class="in2"><input id="qa" placeholder="Add item, e.g. Chairs 12" enterkeyhint="done" autocapitalize="sentences"><button class="btn ac" data-act="qadd">Add</button><button class="btn" data-act="bulk" aria-label="Add many">≡</button></div></div>
+<div class="sw" id="sw"></div><input type="file" id="file" hidden>
 <script>
-const KEY='countit.v1',$=s=>document.querySelector(s);
-let db=JSON.parse(localStorage.getItem(KEY)||'null')||{items:[],sessions:[],blind:true,cur:null};
-let tab='count',q='',loc='',viewSes=null,stream=null;
-const save=()=>localStorage.setItem(KEY,JSON.stringify(db));
-const uid=()=>Math.random().toString(36).slice(2,9);
+const K='countit.v3',$=s=>document.querySelector(s);
+let db=(()=>{let d=null;try{d=JSON.parse(localStorage.getItem(K))}catch(e){}
+ if(!d){d={items:[],theme:'auto'};
+  for(const k of['countit.v2','countit.v1'])try{const o=JSON.parse(localStorage.getItem(k));if(o&&o.items&&o.items.length){o.items.forEach(i=>d.items.push({id:i.id,name:i.name,qty:num(i.exp??i.qty),note:'',ok:false,t:Date.now()}));break}}catch(e){}}
+ return d})();
+let q='',flt='all',srt='recent',snap=null;
+function num(v){const n=parseFloat(v);return isNaN(n)?0:n}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch(e){}};
+const uid=()=>Math.random().toString(36).slice(2,9),fmt=n=>(Math.round(n*100)/100).toLocaleString(),vib=()=>navigator.vibrate&&navigator.vibrate(12);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const num=v=>{const n=parseFloat(v);return isNaN(n)?0:n};
-const fmt=n=>(Math.round(n*100)/100).toLocaleString();
-function toast(m){document.querySelectorAll('.toast').forEach(x=>x.remove());const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.append(t);setTimeout(()=>t.remove(),2200)}
-const sess=id=>db.sessions.find(s=>s.id===id);
 const item=id=>db.items.find(i=>i.id===id);
-db.struct=db.struct||{};
-function sync(){db.items.forEach(i=>{i.loc=i.loc||'Unassigned';i.cat=i.cat||'General';db.struct[i.loc]=db.struct[i.loc]||[];if(!db.struct[i.loc].includes(i.cat))db.struct[i.loc].push(i.cat)});save()}
-const locs=()=>Object.keys(db.struct);
-const secs=l=>db.struct[l]||[];
-function group(arr,L=x=>x.loc,S=x=>x.cat){const out=[];locs().forEach(l=>{const sl=[];secs(l).forEach(s=>{const r=arr.filter(x=>L(x)===l&&S(x)===s);if(r.length)sl.push([s,r])});if(sl.length)out.push([l,sl])});return out}
-function locSel(el,v){el.innerHTML=locs().map(l=>`<option ${l===v?'selected':''}>${esc(l)}</option>`).join('')+'<option value="__new">＋ New location…</option>'}
-function secSel(el,l,v){el.innerHTML=secs(l).map(s=>`<option ${s===v?'selected':''}>${esc(s)}</option>`).join('')+'<option value="__new">＋ New section…</option>'}
-sync();
+const COL=['#FFC61A','#3FA7FF','#0F9D6E','#E8645A','#9B6BFF','#FF8A3D'];
+function migrate(){db.folders=db.folders||[];db.cur=db.cur||null;if(db.items.some(i=>!i.fid)){let f=db.folders[0];if(!f){f={id:uid(),name:'My inventory',col:0};db.folders.push(f)}db.items.forEach(i=>{if(!i.fid)i.fid=f.id})}}
+migrate();
+const cur=()=>db.folders.find(x=>x.id===db.cur)||null,L0=()=>db.items.filter(i=>i.fid===db.cur);
+const applyTheme=()=>document.documentElement.dataset.theme=db.theme;
+function toast(m,fn){document.querySelectorAll('.toast').forEach(x=>x.remove());const t=document.createElement('div');t.className='toast';t.textContent=m;
+ if(fn){const b=document.createElement('button');b.textContent='Undo';b.onclick=()=>{fn();t.remove()};t.append(b)}document.body.append(t);setTimeout(()=>t.remove(),4500)}
+function sheet(h){const w=$('#sw');w.innerHTML=`<div class="sheet">${h}</div>`;w.classList.add('on');const i=w.querySelector('input,textarea');i&&setTimeout(()=>{i.focus();i.select&&i.select()},120)}
+const closeSheet=()=>$('#sw').classList.remove('on');
+const mark=()=>snap=JSON.stringify({i:db.items,f:db.folders,c:db.cur}),restore=()=>{if(snap){const s=JSON.parse(snap);db.items=s.i;db.folders=s.f;db.cur=s.c;snap=null;save();render()}};
 
-/* ---------- Report math ---------- */
-function report(s){
-  const rows=[];
-  const ids=s.status==='closed'?Object.keys(s.snap):db.items.filter(i=>(!s.loc||i.loc===s.loc)&&(!s.sec||i.cat===s.sec)).map(i=>i.id);
-  ids.forEach(id=>{
-    const it=item(id)||{},sn=s.snap&&s.snap[id];
-    const exp=sn?sn.exp:num(it.qty),cost=sn?sn.cost:num(it.cost);
-    const cnt=s.counts[id];const counted=cnt!==undefined;
-    const diff=counted?cnt-exp:null;
-    rows.push({id,loc:sn?sn.loc:it.loc,sec:sn?sn.sec:it.cat,name:sn?sn.name:it.name,sku:sn?sn.sku:it.sku,exp,cnt,counted,diff,val:counted?diff*cost:0});
-  });
-  return rows;
-}
-function totals(rows){
-  const c=rows.filter(r=>r.counted);
-  return{total:rows.length,counted:c.length,match:c.filter(r=>r.diff===0).length,
-    over:c.filter(r=>r.diff>0).length,short:c.filter(r=>r.diff<0).length,val:c.reduce((a,r)=>a+r.val,0)};
-}
+/* parse "Chairs 12", "12 Chairs", "Chairs x12" */
+function parse(t){t=t.trim();let m=t.match(/^(.*?)[\s,:xX×-]*(\d+(?:\.\d+)?)$/);if(m&&m[1].trim())return{name:m[1].trim(),qty:+m[2]};
+ m=t.match(/^(\d+(?:\.\d+)?)\s*[xX×]?\s*(.+)$/);if(m)return{name:m[2].trim(),qty:+m[1]};return{name:t,qty:1}}
+function addStock(name,qty){const ex=L0().find(i=>i.name.toLowerCase()===name.toLowerCase());
+ if(ex){ex.qty+=qty;ex.t=Date.now();return[ex,false]}const it={id:uid(),fid:db.cur,name,qty,note:'',ok:false,t:Date.now()};db.items.push(it);return[it,true]}
+function quickAdd(){const el=$('#qa'),v=el.value.trim();if(!v)return;const{name,qty}=parse(v);mark();const[it,isNew]=addStock(name,qty);save();el.value='';vib();render(it.id);
+ toast(isNew?`Added ${name}: ${fmt(qty)}`:`${it.name} +${fmt(qty)} → ${fmt(it.qty)}`,restore)}
 
-/* ---------- Render ---------- */
-function nav(){
-  const t=[['count','Count'],['items','Items'],['reports','Reports'],['settings','Settings']];
-  $('#nav').innerHTML=t.map(([k,l])=>`<button data-tab="${k}" class="${tab===k?'on':''}">${l}</button>`).join('');
-}
-function render(){nav();({count:rCount,items:rItems,reports:rReports,settings:rSettings})[tab]();}
+/* ---------- render ---------- */
+function rInv(bumpId){
+ const A=L0();
+ const n=A.length,units=A.reduce((a,i)=>a+i.qty,0),done=A.filter(i=>i.ok).length;
+ $('#st').innerHTML=`<div class="stats"><div><b>${n}</b><span class="mut">Items</span></div><div><b>${fmt(units)}</b><span class="mut">Total units</span></div></div>${n?`<div class="bar"><i style="width:${done/n*100}%"></i></div><div class="mut" style="margin-top:6px">${done} of ${n} checked</div>`:''}`;
+ const F=[['all','All '+n],['todo','To check '+(n-done)],['done','Checked '+done],['zero','Out of stock '+A.filter(i=>!i.qty).length]];
+ $('#ch').innerHTML=F.map(([k,l])=>`<button class="chip ${flt===k?'on':''}" data-f="${k}">${l}</button>`).join('')+`<button class="chip" data-act="sort">Sort: ${srt==='recent'?'Recent':'A–Z'}</button>`;
+ let L=A.filter(i=>(!q||(i.name+i.note).toLowerCase().includes(q.toLowerCase()))&&(flt==='all'||(flt==='todo'&&!i.ok)||(flt==='done'&&i.ok)||(flt==='zero'&&!i.qty)));
+ L.sort(srt==='az'?(a,b)=>a.name.localeCompare(b.name):(a,b)=>b.t-a.t);
+ $('#list').innerHTML=L.map(i=>`<div class="it ${i.ok?'ok':''}" data-id="${i.id}"><button class="ck" data-ck="${i.id}" aria-label="Mark checked">✓</button>
+ <div class="ib" data-edit="${i.id}"><div class="in">${esc(i.name)}</div>${i.note?`<div class="mut t">${esc(i.note)}</div>`:''}</div>
+ <button class="mn" data-d="${i.id}" aria-label="Minus one">−</button><button class="nm ${i.qty?'':'z'} ${i.id===bumpId?'bump':''}" data-k="${i.id}" aria-label="Set quantity">${fmt(i.qty)}</button><button class="pl" data-i="${i.id}" aria-label="Plus one">+</button></div>`).join('')
+ ||`<div class="empty"><b>${n?'Nothing here':'Add your first item'}</b>${n?'Try another filter or search.':'Type a name and quantity in the bar below, like <i>Chairs 12</i>, then tap Add.'}</div>`}
+function rHome(){const F=db.folders,u=db.items.reduce((a,i)=>a+i.qty,0);
+ $('#home').innerHTML=(F.length?`<div class="card"><div class="stats"><div><b>${F.length}</b><span class="mut">Folders</span></div><div><b>${fmt(u)}</b><span class="mut">Units in total</span></div></div></div>`:'')+
+ `<div class="fg">${F.map(f=>{const A=db.items.filter(i=>i.fid===f.id),d=A.filter(i=>i.ok).length;return `<button class="fc" data-fo="${f.id}" style="--c:${COL[f.col%COL.length]}"><div class="fd"></div><div class="fn">${esc(f.name)}</div><div class="mut">${A.length} item${A.length==1?'':'s'} · ${fmt(A.reduce((a,i)=>a+i.qty,0))} units</div><div class="bar" style="margin-top:10px"><i style="width:${A.length?d/A.length*100:0}%"></i></div></button>`}).join('')}<button class="fc nw" data-act="newf">＋ New folder</button></div>`+
+ (F.length?'':`<div class="empty"><b>Make your first folder</b>Use folders to keep different stock apart, like Store room, Kitchen or Office.</div>`)}
+function render(b){const f=cur();$('#home').hidden=!!f;$('#inv').hidden=!f;$('#addbar').hidden=!f;$('#back').hidden=!f;$('#lg').style.display=f?'none':'';$('#ttl').textContent=f?f.name:'Count It';f?rInv(b):rHome()}
+function folderSheet(f){sheet(`<h3>${f?'Rename folder':'New folder'}</h3><p class="mut">A separate inventory, like Store room or Kitchen.</p><input id="fnm" value="${esc(f?f.name:'')}" maxlength="40" placeholder="Folder name">
+ ${f?'':`<div class="chips">${['Store room','Kitchen','Office','Workshop'].filter(n=>!db.folders.some(x=>x.name===n)).map(n=>`<button class="chip" data-sug="${n}">${n}</button>`).join('')}</div>`}
+ <button class="btn ac w" data-act="fsave" data-id="${f?f.id:''}" style="margin-top:14px">${f?'Save':'Create folder'}</button>`);$('#fnm').onkeydown=e=>{if(e.key==='Enter')fSave(f?f.id:'')}}
+function fSave(id){const n=$('#fnm').value.trim();if(!n)return;if(db.folders.some(x=>x.id!==id&&x.name.toLowerCase()===n.toLowerCase()))return toast('That folder already exists');
+ if(id)db.folders.find(x=>x.id===id).name=n;else{const f={id:uid(),name:n,col:db.folders.length};db.folders.push(f);db.cur=f.id;q='';$('#q').value='';flt='all'}save();closeSheet();render();scrollTo(0,0)}
+function change(id,d){const i=item(id);if(!i)return;i.qty=Math.max(0,i.qty+d);i.t=Date.now();save();vib();render(id)}
 
-function itemCard(i){return `<div class="card row" data-edit="${i.id}"><div class="grow"><div class="b">${esc(i.name)}</div><div class="mut">${esc(i.sku||'No SKU')}</div></div>
-  ${i.min&&num(i.qty)<=num(i.min)?'<span class="tag low">Low</span>':''}<div class="b" style="font-size:20px">${fmt(num(i.qty))} <span class="mut">${esc(i.unit||'')}</span></div></div>`}
-function rItems(){
-  const list=db.items.filter(i=>!q||(i.name+i.sku+i.cat+i.loc).toLowerCase().includes(q.toLowerCase()));
-  const low=db.items.filter(i=>i.min&&num(i.qty)<=num(i.min)).length;
-  const val=db.items.reduce((a,i)=>a+num(i.qty)*num(i.cost),0);
-  const g=group(list);
-  $('#main').innerHTML=`
-  <div class="stats"><div><b>${db.items.length}</b><span class="mut">Items</span></div><div><b>${low}</b><span class="mut">Low stock</span></div><div><b>${fmt(val)}</b><span class="mut">Stock value</span></div></div>
-  <div class="row" style="margin-bottom:10px"><input id="q" type="search" placeholder="Search items" value="${esc(q)}"><button class="btn ghost" data-act="manage" style="white-space:nowrap">Locations</button></div>
-  ${g.length?g.map(([l,sl])=>`<details class="loc" open><summary>${esc(l)}<span class="mut">${sl.reduce((a,x)=>a+x[1].length,0)} items</span></summary>
-  ${sl.map(([s,r])=>`<div class="sec">${esc(s)}<span class="mut">${r.length}</span></div>${r.map(itemCard).join('')}`).join('')}</details>`).join(''):
-  `<div class="empty">${q?'No matching items.':'No items yet.<br>Tap + to add one, set up your locations with the Locations button, or load sample items in Settings.'}</div>`}
-  <button class="fab" data-act="add" aria-label="Add item">+</button>`;
-  const qi=$('#q');qi.oninput=()=>{q=qi.value;const p=qi.selectionStart;rItems();const n=$('#q');n.focus();n.setSelectionRange(p,p)};
-}
+/* ---------- sheets ---------- */
+function keypad(id){const i=item(id);sheet(`<h3>${esc(i.name)}</h3><p class="mut">Set the quantity</p><input id="kv" class="kv" type="number" inputmode="decimal" value="${i.qty}" data-id="${id}">
+ <div class="row" style="justify-content:center;margin-top:12px;flex-wrap:wrap">${[1,5,10,50].map(n=>`<button class="chip" data-add="${n}">+${n}</button>`).join('')}</div>
+ <div class="row" style="margin-top:16px"><button class="btn" data-act="x">Cancel</button><button class="btn p grow" data-act="kset">Set quantity</button></div>`);
+ $('#kv').onkeydown=e=>{if(e.key==='Enter')kset()}}
+function kset(){const i=item($('#kv').dataset.id);i.qty=Math.max(0,num($('#kv').value));i.t=Date.now();save();closeSheet();render(i.id)}
+function editSheet(id){const i=item(id);sheet(`<h3>Edit item</h3><label>Name</label><input id="en" value="${esc(i.name)}"><label>Quantity</label><input id="eq" type="number" inputmode="decimal" value="${i.qty}"><label>Note (optional)</label><input id="eo" value="${esc(i.note)}" placeholder="e.g. Room 2, damaged"><label>Folder</label><select id="ef">${db.folders.map(f=>`<option value="${f.id}" ${f.id===i.fid?'selected':''}>${esc(f.name)}</option>`).join('')}</select>
+ <div class="row" style="margin-top:18px"><button class="btn bad" data-act="del" data-id="${id}">Delete</button><span class="grow"></span><button class="btn p" data-act="esave" data-id="${id}">Save</button></div>`)}
+function bulkSheet(){sheet(`<h3>Add many items</h3><p class="mut">One per line, like “Chairs 12”. Existing items get the quantity added.</p><textarea id="bt" rows="7" placeholder="Chairs 12&#10;Tables 4&#10;Whiteboard 2"></textarea><button class="btn ac w" data-act="badd" style="margin-top:14px">Add to stock</button>`)}
+function menu(){const f=cur();sheet(`<h3>Menu</h3>${f?`<p class="mut">${esc(f.name)}</p><div class="grid2"><button class="btn" data-act="frn">Rename folder</button><button class="btn" data-act="reset">Reset checks</button><button class="btn" data-act="exp">Export CSV</button><button class="btn" data-act="imp">Import CSV</button><button class="btn" data-act="sample">Sample items</button><button class="btn bad" data-act="fdel">Delete folder</button></div>`:''}
+ <label>Appearance</label><div class="seg">${['auto','light','dark'].map(t=>`<button data-th="${t}" class="${db.theme===t?'on':''}">${t[0].toUpperCase()+t.slice(1)}</button>`).join('')}</div>
+ <div class="grid2"><button class="btn" data-act="bk">Backup all</button><button class="btn" data-act="rs">Restore</button></div><button class="btn bad w" data-act="wipe" style="margin-top:14px">Erase everything</button>`)}
 
-function itemForm(id){
-  if(!locs().length){db.struct['Main store']=['General'];save()}
-  const i=id?item(id):{name:'',sku:'',cat:'',loc:'',unit:'pcs',qty:0,min:0,cost:0};
-  const d=$('#dlg');
-  d.innerHTML=`<h3 style="margin-top:0">${id?'Edit item':'Add item'}</h3>
-  <label>Name</label><input id="f_name" value="${esc(i.name)}">
-  <div class="row"><div class="grow"><label>Location</label><select id="f_loc"></select></div><div class="grow"><label>Section</label><select id="f_cat"></select></div></div>
-  <div class="row"><div class="grow"><label>SKU / barcode</label><input id="f_sku" value="${esc(i.sku)}"></div><div class="grow"><label>Unit</label><input id="f_unit" value="${esc(i.unit)}"></div></div>
-  <div class="row"><div class="grow"><label>In stock</label><input id="f_qty" type="number" inputmode="decimal" value="${i.qty}"></div><div class="grow"><label>Reorder at</label><input id="f_min" type="number" inputmode="decimal" value="${i.min}"></div><div class="grow"><label>Unit cost</label><input id="f_cost" type="number" inputmode="decimal" value="${i.cost}"></div></div>
-  <div class="row" style="margin-top:16px">${id?'<button class="btn bad" id="f_del">Delete</button>':''}<span class="grow"></span><button class="btn ghost" id="f_x">Cancel</button><button class="btn hi" id="f_ok">Save item</button></div>`;
-  const fl=$('#f_loc'),fc=$('#f_cat');
-  locSel(fl,i.loc||(loc&&db.struct[loc]?loc:locs()[0]));secSel(fc,fl.value,i.cat);
-  fl.onchange=()=>{if(fl.value==='__new'){const n=(prompt('New location name')||'').trim();if(n&&!db.struct[n]){db.struct[n]=['General'];save()}locSel(fl,n||locs()[0])}secSel(fc,fl.value)};
-  fc.onchange=()=>{if(fc.value==='__new'){const n=(prompt('New section name')||'').trim();if(n&&!secs(fl.value).includes(n)){db.struct[fl.value].push(n);save()}secSel(fc,fl.value,n||secs(fl.value)[0])}};
-  d.showModal();
-  $('#f_x').onclick=()=>d.close();
-  if(id)$('#f_del').onclick=()=>{if(confirm('Delete this item?')){db.items=db.items.filter(x=>x.id!==id);save();d.close();render()}};
-  $('#f_ok').onclick=()=>{
-    const name=$('#f_name').value.trim();if(!name)return toast('Enter an item name');
-    const sku=$('#f_sku').value.trim();
-    if(sku&&db.items.some(x=>x.sku===sku&&x.id!==id))return toast('That SKU is already used');
-    const o={name,sku,unit:$('#f_unit').value.trim(),cat:fc.value,loc:fl.value,qty:num($('#f_qty').value),min:num($('#f_min').value),cost:num($('#f_cost').value)};
-    if(id)Object.assign(item(id),o);else db.items.push({id:uid(),...o});
-    save();d.close();render();toast('Item saved');
-  };
-}
-
-function manage(){
-  const d=$('#dlg'),L=locs();
-  const n=(l,s)=>db.items.filter(i=>i.loc===l&&(s===undefined||i.cat===s)).length;
-  d.innerHTML=`<h3 style="margin-top:0">Locations and sections</h3>
-  ${L.map((l,a)=>`<div class="card"><div class="row"><div class="grow b">${esc(l)} <span class="mut">${n(l)} items</span></div><button class="btn ghost" data-m="rl" data-a="${a}">Rename</button><button class="btn ghost" data-m="dl" data-a="${a}">Delete</button></div>
-  ${secs(l).map((s,b)=>`<div class="row" style="margin-top:8px;padding-left:10px"><div class="grow">${esc(s)} <span class="mut">${n(l,s)}</span></div><button class="btn ghost" data-m="rs" data-a="${a}" data-b="${b}">Rename</button><button class="btn ghost" data-m="ds" data-a="${a}" data-b="${b}">Delete</button></div>`).join('')}
-  <button class="btn ghost" data-m="as" data-a="${a}" style="margin-top:10px">Add section</button></div>`).join('')||'<p class="mut">No locations yet.</p>'}
-  <div class="row"><button class="btn hi" data-m="al">Add location</button><span class="grow"></span><button class="btn ghost" data-m="done">Done</button></div>`;
-  if(!d.open)d.showModal();
-  d.onclick=e=>{const t=e.target.closest('[data-m]');if(!t)return;
-    const m=t.dataset.m,l=L[t.dataset.a],s=l&&secs(l)[t.dataset.b];
-    const ask=(m,v)=>(prompt(m,v||'')||'').trim();
-    if(m==='done'){d.onclick=null;d.close();return render()}
-    if(m==='al'){const x=ask('Location name');if(x&&!db.struct[x])db.struct[x]=['General'];else if(x)toast('Already exists')}
-    if(m==='as'){const x=ask('Section name');if(x&&!secs(l).includes(x))db.struct[l].push(x)}
-    if(m==='rl'){const x=ask('Rename location',l);if(x&&x!==l&&!db.struct[x]){db.struct=Object.fromEntries(Object.entries(db.struct).map(([k,v])=>[k===l?x:k,v]));db.items.forEach(i=>{if(i.loc===l)i.loc=x});db.sessions.forEach(z=>{if(z.loc===l)z.loc=x})}}
-    if(m==='rs'){const x=ask('Rename section',s);if(x&&x!==s&&!secs(l).includes(x)){db.struct[l][t.dataset.b]=x;db.items.forEach(i=>{if(i.loc===l&&i.cat===s)i.cat=x});db.sessions.forEach(z=>{if(z.loc===l&&z.sec===s)z.sec=x})}}
-    if(m==='dl'){if(n(l))toast('Move or delete its items first');else if(confirm('Delete location '+l+'?'))delete db.struct[l]}
-    if(m==='ds'){if(n(l,s))toast('Move or delete its items first');else if(confirm('Delete section '+s+'?'))db.struct[l].splice(t.dataset.b,1)}
-    save();manage();
-  };
-}
-
-function rCount(){
-  const open=db.sessions.filter(s=>s.status==='open');
-  if(!open.length){
-    $('#main').innerHTML=`<div class="card"><h3 style="margin-top:0">Start a stock take</h3>
-    <label>Name</label><input id="s_name" value="Count ${new Date().toLocaleDateString()}">
-    <label>Location</label><select id="s_loc"></select>
-    <label>Section</label><select id="s_sec"></select>
-    <button class="btn hi" data-act="newses" style="margin-top:14px;width:100%" ${db.items.length?'':'disabled'}>Start counting</button>
-    ${db.items.length?'':'<p class="mut">Add items first in the Items tab.</p>'}</div>`;
-    const sl=$('#s_loc'),ss=$('#s_sec');
-    const fillS=()=>{ss.innerHTML='<option value="">All sections</option>'+(sl.value?secs(sl.value).map(s=>`<option>${esc(s)}</option>`).join(''):'')};
-    sl.innerHTML='<option value="">All locations</option>'+locs().map(l=>`<option>${esc(l)}</option>`).join('');fillS();sl.onchange=fillS;return;
-  }
-  if(!sess(db.cur)||sess(db.cur).status!=='open')db.cur=open[0].id;
-  const s=sess(db.cur),rows=report(s),t=totals(rows);
-  const list=rows.filter(r=>!q||(r.name+r.sku+r.sec+r.loc).toLowerCase().includes(q.toLowerCase()));
-  const pct=t.total?Math.round(t.counted/t.total*100):0;
-  const rowH=r=>{const el=r.counted;return `<div class="card row ${el?'done':'todo'}" id="r_${r.id}"><div class="grow"><div class="b">${esc(r.name)}</div><div class="mut">${esc(r.sku||'')}${!db.blind||el?` · system ${fmt(r.exp)}`:''}${el&&r.diff?` · <span class="${r.diff>0?'pos':'neg'}">${r.diff>0?'+':''}${fmt(r.diff)}</span>`:''}</div></div>
-  <div class="stepper"><button data-dec="${r.id}" aria-label="Minus one">−</button><input data-cnt="${r.id}" type="number" inputmode="decimal" placeholder="–" value="${el?r.cnt:''}"><button data-inc="${r.id}" aria-label="Plus one">+</button></div></div>`};
-  const g=group(list,r=>r.loc,r=>r.sec);
-  $('#main').innerHTML=`
-  ${open.length>1?`<select id="pick" style="margin-bottom:10px">${open.map(o=>`<option value="${o.id}" ${o.id===s.id?'selected':''}>${esc(o.name)}</option>`).join('')}</select>`:''}
-  <div class="card"><div class="row"><div class="grow b">${esc(s.name)}${s.loc?` <span class="tag">${esc(s.loc)}${s.sec?' / '+esc(s.sec):''}</span>`:''}</div><div class="b">${t.counted}/${t.total}</div></div>
-  <div class="bar" style="margin:8px 0"><i style="width:${pct}%"></i></div>
-  <div class="row"><button class="btn ghost" data-act="finish" style="flex:1">Review &amp; finish</button><button class="btn ghost" data-act="newses2">New</button></div></div>
-  <div class="row" style="margin-bottom:10px"><input id="scan" placeholder="Scan or type SKU, press Enter" enterkeyhint="done"><button class="btn hi" data-act="cam" id="camBtn" ${'BarcodeDetector' in window?'':'hidden'}>Scan</button></div>
-  <input id="q" type="search" placeholder="Find item" value="${esc(q)}" style="margin-bottom:6px">
-  ${g.map(([l,sl])=>`<div class="lochead">${esc(l)}<span class="mut">${sl.reduce((a,x)=>a+x[1].filter(r=>r.counted).length,0)}/${sl.reduce((a,x)=>a+x[1].length,0)}</span></div>${sl.map(([sc,r])=>`<div class="sec">${esc(sc)}<span class="mut">${r.filter(x=>x.counted).length}/${r.length}</span></div>${r.map(rowH).join('')}`).join('')}`).join('')||'<div class="empty">No matching items.</div>'}`;
-  const qi=$('#q');qi.oninput=()=>{q=qi.value;const p=qi.selectionStart;rCount();const n=$('#q');n.focus();n.setSelectionRange(p,p)};
-  $('#scan').onkeydown=e=>{if(e.key==='Enter'){onCode(e.target.value.trim());e.target.value=''}};
-  const pk=$('#pick');if(pk)pk.onchange=()=>{db.cur=pk.value;save();rCount()};
-}
-function setCount(id,v){const s=sess(db.cur);if(v===null)delete s.counts[id];else s.counts[id]=Math.max(0,v);save()}
-function onCode(code){
-  if(!code)return;const s=sess(db.cur);
-  const it=db.items.find(i=>i.sku===code);
-  if(!it)return toast('No item with SKU '+code);
-  if((s.loc&&it.loc!==s.loc)||(s.sec&&it.cat!==s.sec))return toast('Not in this count: '+it.name);
-  setCount(it.id,(s.counts[it.id]||0)+1);q='';rCount();
-  const el=$('#r_'+it.id);if(el)el.scrollIntoView({block:'center'});
-  toast(it.name+': '+s.counts[it.id]);
-  if(navigator.vibrate)navigator.vibrate(40);
-}
-async function camScan(){
-  const d=$('#dlg');d.innerHTML=`<video id="vid" playsinline muted></video><p class="mut" id="cs">Point at a barcode</p><button class="btn ghost" id="cx" style="width:100%">Close</button>`;d.showModal();
-  let on=true;const stop=()=>{on=false;if(stream)stream.getTracks().forEach(t=>t.stop());stream=null;d.close()};
-  $('#cx').onclick=stop;d.onclose=()=>{on=false;if(stream)stream.getTracks().forEach(t=>t.stop())};
-  try{
-    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
-    const v=$('#vid');v.srcObject=stream;await v.play();
-    const det=new BarcodeDetector();let last='',lt=0;
-    const loop=async()=>{if(!on)return;
-      try{const r=await det.detect(v);if(r[0]){const c=r[0].rawValue,n=Date.now();if(c!==last||n-lt>1500){last=c;lt=n;onCode(c);$('#cs').textContent='Last: '+c}}}catch(e){}
-      setTimeout(loop,250)};loop();
-  }catch(e){$('#cs').textContent='Camera not available. Type the SKU instead.'}
-}
-function finish(){
-  const s=sess(db.cur),rows=report(s),t=totals(rows),un=t.total-t.counted;
-  const d=$('#dlg');
-  d.innerHTML=`<h3 style="margin-top:0">Finish "${esc(s.name)}"</h3>
-  <div class="stats"><div><b>${t.match}</b><span class="mut">Match</span></div><div><b class="pos">${t.over}</b><span class="mut">Over</span></div><div><b class="neg">${t.short}</b><span class="mut">Short</span></div></div>
-  <p>Value difference: <b class="${t.val<0?'neg':'pos'}">${fmt(t.val)}</b></p>
-  ${un?`<p class="mut">${un} item${un>1?'s':''} not counted yet. They will stay as they are.</p>`:''}
-  <label style="display:flex;gap:10px;align-items:center;color:var(--tx)"><input type="checkbox" id="apply" checked style="width:auto"> Update stock levels to the counted quantities</label>
-  <div class="row" style="margin-top:16px"><span class="grow"></span><button class="btn ghost" id="fx">Keep counting</button><button class="btn hi" id="fok">Close count</button></div>`;
-  d.showModal();$('#fx').onclick=()=>d.close();
-  $('#fok').onclick=()=>{
-    s.snap={};rows.forEach(r=>{const it=item(r.id)||{};s.snap[r.id]={loc:r.loc,sec:r.sec,name:r.name,sku:r.sku,exp:r.exp,cost:num(it.cost)}});
-    if($('#apply').checked)rows.forEach(r=>{if(r.counted)item(r.id).qty=r.cnt});
-    s.applied=$('#apply').checked;s.status='closed';s.closed=Date.now();db.cur=null;save();d.close();
-    viewSes=s.id;tab='reports';render();toast('Count closed');
-  };
-}
-
-function rReports(){
-  if(viewSes&&sess(viewSes)){
-    const s=sess(viewSes),rows=report(s),t=totals(rows);
-    $('#main').innerHTML=`<button class="btn ghost" data-act="back">Back</button>
-    <h3>${esc(s.name)} <span class="tag">${s.status}</span></h3>
-    <div class="stats"><div><b>${t.counted}/${t.total}</b><span class="mut">Counted</span></div><div><b>${t.over+t.short}</b><span class="mut">Variances</span></div><div><b class="${t.val<0?'neg':'pos'}">${fmt(t.val)}</b><span class="mut">Value diff</span></div></div>
-    <div class="row" style="margin-bottom:10px"><button class="btn hi" data-act="csvses">Export CSV</button><button class="btn bad" data-act="delses">Delete</button></div>
-    <div class="card scroll"><table><tr><th>Item</th><th>System</th><th>Counted</th><th>Diff</th></tr>
-    ${rows.sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).map(r=>`<tr><td>${esc(r.name)}<div class="mut">${esc(r.loc)} / ${esc(r.sec)}</div></td><td>${fmt(r.exp)}</td><td>${r.counted?fmt(r.cnt):'–'}</td><td class="${r.diff>0?'pos':r.diff<0?'neg':''}">${r.counted?(r.diff>0?'+':'')+fmt(r.diff):'–'}</td></tr>`).join('')}</table></div>`;return;
-  }
-  $('#main').innerHTML=db.sessions.length?[...db.sessions].reverse().map(s=>{const t=totals(report(s));return `<div class="card row" data-ses="${s.id}"><div class="grow"><div class="b">${esc(s.name)}</div><div class="mut">${new Date(s.created).toLocaleDateString()} · ${t.counted}/${t.total} counted · ${t.over+t.short} variances</div></div><span class="tag">${s.status}</span></div>`}).join(''):'<div class="empty">No stock takes yet. Start one in the Count tab.</div>';
-}
-
-function rSettings(){
-  $('#main').innerHTML=`
-  <div class="card"><label style="display:flex;gap:10px;align-items:center;margin:0;color:var(--tx)"><input type="checkbox" id="blind" ${db.blind?'checked':''} style="width:auto"> Blind count (hide system quantity while counting)</label></div>
-  <div class="card"><div class="b">Locations and sections</div><p class="mut">Group items by location, then by section inside each location.</p><button class="btn ghost" data-act="manage">Manage locations</button></div>
-  <div class="card"><div class="b">Items</div><div class="row" style="margin-top:8px;flex-wrap:wrap">
-  <button class="btn ghost" data-act="expitems">Export CSV</button><button class="btn ghost" data-act="impitems">Import CSV</button><button class="btn ghost" data-act="sample">Load sample items</button></div>
-  <p class="mut">CSV columns: name, sku, category (section), location, unit, qty, min, cost. New locations and sections are created automatically.</p></div>
-  <div class="card"><div class="b">Backup</div><div class="row" style="margin-top:8px"><button class="btn ghost" data-act="bk">Download backup</button><button class="btn ghost" data-act="rs">Restore backup</button></div></div>
-  <div class="card"><button class="btn bad" data-act="wipe">Erase all data</button></div>
-  <input type="file" id="file" hidden>`;
-  $('#blind').onchange=e=>{db.blind=e.target.checked;save()};
-}
-
-/* ---------- File helpers ---------- */
-function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:type||'text/csv'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-const csvCell=v=>/[",\n]/.test(v=String(v??''))?'"'+v.replace(/"/g,'""')+'"':v;
-const toCSV=rows=>rows.map(r=>r.map(csvCell).join(',')).join('\n');
-function parseCSV(t){const out=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];
-  if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
-  else if(ch==='"')q=true;else if(ch===','){r.push(c);c=''}
-  else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';if(r.some(x=>x!==''))out.push(r);r=[]}
-  else c+=ch}
-  r.push(c);if(r.some(x=>x!==''))out.push(r);return out}
+/* ---------- files ---------- */
+function download(n,t,ty){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:ty||'text/csv'}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+const cc=v=>/[",\n]/.test(v=String(v??''))?'"'+String(v).replace(/"/g,'""')+'"':v;
+function parseCSV(t){const o=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++){const h=t[i];if(q){if(h==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=h}else if(h==='"')q=true;else if(h===','){r.push(c);c=''}else if(h==='\n'||h==='\r'){if(h==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';if(r.some(x=>x!==''))o.push(r);r=[]}else c+=h}r.push(c);if(r.some(x=>x!==''))o.push(r);return o}
 function pickFile(cb){const f=$('#file');f.value='';f.onchange=()=>{const r=new FileReader();r.onload=()=>cb(r.result);r.readAsText(f.files[0])};f.click()}
 
-/* ---------- Actions ---------- */
+/* ---------- events ---------- */
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-tab],[data-act],[data-edit],[data-ses],[data-inc],[data-dec]');if(!t)return;
-  const D=t.dataset;
-  if(D.tab){tab=D.tab;q='';viewSes=null;return render()}
-  if(D.edit)return itemForm(D.edit);
-  if(D.ses){viewSes=D.ses;return render()}
-  if(D.inc||D.dec){const id=D.inc||D.dec,s=sess(db.cur),v=(s.counts[id]||0)+(D.inc?1:-1);setCount(id,v);return rCount()}
-  switch(D.act){
-    case'add':return itemForm();
-    case'manage':return manage();
-    case'newses':case'newses2':{
-            const nm=($('#s_name')||{}).value||'Count '+new Date().toLocaleDateString(),lc=($('#s_loc')||{}).value||'',sc=($('#s_sec')||{}).value||'';
-      const s={id:uid(),name:nm,loc:lc,sec:sc,created:Date.now(),status:'open',counts:{}};
-      if(D.act==='newses2'){const n=prompt('Name for the new count?','Count '+new Date().toLocaleDateString());if(!n)return;s.name=n}
-      db.sessions.push(s);db.cur=s.id;save();return render()}
-    case'cam':return camScan();
-    case'finish':return finish();
-    case'back':viewSes=null;return render();
-    case'delses':if(confirm('Delete this report?')){db.sessions=db.sessions.filter(s=>s.id!==viewSes);if(db.cur===viewSes)db.cur=null;viewSes=null;save();render()}return;
-    case'csvses':{const s=sess(viewSes);download(s.name.replace(/\W+/g,'_')+'.csv',toCSV([['location','section','name','sku','system','counted','diff'],...report(s).map(r=>[r.loc,r.sec,r.name,r.sku,r.exp,r.counted?r.cnt:'',r.counted?r.diff:''])]));return}
-    case'expitems':return download('count-it-items.csv',toCSV([['name','sku','category','location','unit','qty','min','cost'],...db.items.map(i=>[i.name,i.sku,i.cat,i.loc,i.unit,i.qty,i.min,i.cost])]));
-    case'impitems':return pickFile(t=>{const rows=parseCSV(t),h=rows.shift().map(x=>x.trim().toLowerCase());let n=0;
-      rows.forEach(r=>{const o={};h.forEach((k,i)=>o[k]=(r[i]||'').trim());if(!o.name)return;
-        const ex=o.sku&&db.items.find(i=>i.sku===o.sku);const v={name:o.name,sku:o.sku||'',cat:o.category||o.cat||'',loc:o.location||o.loc||'',unit:o.unit||'pcs',qty:num(o.qty),min:num(o.min),cost:num(o.cost)};
-        if(ex)Object.assign(ex,v);else db.items.push({id:uid(),...v});n++});
-      sync();toast(n+' items imported');render()});
-    case'sample':{[['Cement 50kg bag','CEM-50','Cement and sand','Shed A','bags',40,10,28],['Sharp sand 25kg','SND-25','Cement and sand','Shed A','bags',30,8,12],['Claw hammer','HAM-01','Hand tools','Shed B','pcs',12,3,35],['Tape measure 5m','TAP-05','Hand tools','Shed B','pcs',8,2,15],['Nails 75mm (1kg)','NAI-75','Fixings','Shed B','boxes',25,8,9],['Wood glue 1L','GLU-1L','Adhesives','Shed B','btl',9,4,22],['Treated timber 4x2','TMB-42','Timber','Yard','lengths',120,30,18],['Plywood 18mm','PLY-18','Sheet goods','Yard','sheets',35,10,95]]
-      .forEach(([name,sku,cat,loc,unit,qty,min,cost])=>{if(!db.items.some(i=>i.sku===sku))db.items.push({id:uid(),name,sku,cat,loc,unit,qty,min,cost})});sync();toast('Sample items added');return render()}
-    case'bk':return download('count-it-backup.json',JSON.stringify(db),'application/json');
-    case'rs':return pickFile(t=>{try{const o=JSON.parse(t);if(!o.items||!o.sessions)throw 0;db=o;db.struct=db.struct||{};sync();toast('Backup restored');render()}catch(e){toast('That file is not a Count It backup')}});
-    case'wipe':if(confirm('Erase every item and count on this device?')){db={items:[],sessions:[],blind:true,cur:null,struct:{}};save();render()}return;
-  }
-});
-document.addEventListener('change',e=>{const id=e.target.dataset&&e.target.dataset.cnt;if(!id)return;
-  const v=e.target.value;setCount(id,v===''?null:num(v));rCount()});
-
-/* ---------- PWA ---------- */
+ if(e.target.id==='sw')return closeSheet();
+ const t=e.target.closest('[data-fo],[data-sug],[data-i],[data-d],[data-k],[data-ck],[data-edit],[data-f],[data-act],[data-add],[data-th]');if(!t)return;const D=t.dataset;
+ if(D.fo){db.cur=D.fo;q='';$('#q').value='';flt='all';save();render();return scrollTo(0,0)}
+ if(D.sug){$('#fnm').value=D.sug;return}
+ if(D.i)return change(D.i,1);if(D.d)return change(D.d,-1);if(D.k)return keypad(D.k);
+ if(D.ck){const i=item(D.ck);i.ok=!i.ok;save();vib();return render()}
+ if(D.edit)return editSheet(D.edit);if(D.f){flt=D.f;return render()}
+ if(D.add){const k=$('#kv');k.value=num(k.value)+num(D.add);return vib()}
+ if(D.th){db.theme=D.th;applyTheme();save();return menu()}
+ switch(D.act){
+  case'home':db.cur=null;save();render();return scrollTo(0,0);case'newf':return folderSheet();case'frn':return folderSheet(cur());case'fsave':return fSave(D.id);
+  case'fdel':{const f=cur(),n=L0().length;if(!confirm(`Delete "${f.name}"${n?` and its ${n} item${n>1?'s':''}`:''}?`))return;mark();db.items=db.items.filter(x=>x.fid!==f.id);db.folders=db.folders.filter(x=>x!==f);db.cur=null;save();closeSheet();render();return toast(`Deleted ${f.name}`,restore)}
+  case'qadd':return quickAdd();case'menu':return menu();case'bulk':return bulkSheet();case'x':return closeSheet();case'kset':return kset();
+  case'sort':srt=srt==='recent'?'az':'recent';return render();
+  case'esave':{const i=item(D.id),n=$('#en').value.trim();if(!n)return toast('Enter a name');const fid=$('#ef').value;if(db.items.some(x=>x!==i&&x.fid===fid&&x.name.toLowerCase()===n.toLowerCase()))return toast('That item already exists in that folder');
+   i.fid=fid;i.name=n;i.qty=Math.max(0,num($('#eq').value));i.note=$('#eo').value.trim();i.t=Date.now();save();closeSheet();return render(i.id)}
+  case'del':{mark();const n=item(D.id).name;db.items=db.items.filter(x=>x.id!==D.id);save();closeSheet();render();return toast(`Deleted ${n}`,restore)}
+  case'badd':{const L=$('#bt').value.split('\n').map(x=>x.trim()).filter(Boolean);if(!L.length)return;mark();L.forEach(l=>{const p=parse(l);addStock(p.name,p.qty)});save();closeSheet();render();return toast(`${L.length} line${L.length>1?'s':''} added`,restore)}
+  case'reset':mark();L0().forEach(i=>i.ok=false);save();closeSheet();render();return toast('Checks reset',restore);
+  case'exp':return download((cur().name.replace(/\W+/g,'_')||'count-it')+'.csv',['name,qty,note',...L0().map(i=>[cc(i.name),i.qty,cc(i.note)].join(','))].join('\n'));
+  case'imp':return pickFile(t=>{const r=parseCSV(t),h=r.shift().map(x=>x.trim().toLowerCase());let n=0;mark();r.forEach(x=>{const o={};h.forEach((k,i)=>o[k]=(x[i]||'').trim());if(!o.name)return;const ex=L0().find(i=>i.name.toLowerCase()===o.name.toLowerCase()),qy=num(o.qty??o.quantity);
+   if(ex){ex.qty=qy;if(o.note)ex.note=o.note}else db.items.push({id:uid(),fid:db.cur,name:o.name,qty:qy,note:o.note||'',ok:false,t:Date.now()});n++});save();closeSheet();render();toast(n+' items imported',restore)});
+  case'sample':mark();[['Chairs',40],['Tables',12],['Whiteboards',6],['Projectors',3],['Laptops',25]].forEach(([n,q])=>addStock(n,q));save();closeSheet();render();return toast('Sample items added',restore);
+  case'bk':return download('count-it-backup.json',JSON.stringify(db),'application/json');
+  case'rs':return pickFile(t=>{try{const o=JSON.parse(t);if(!Array.isArray(o.items))throw 0;mark();db={items:o.items,folders:o.folders||[],cur:null,theme:o.theme||'auto'};migrate();save();applyTheme();closeSheet();render();toast('Backup restored',restore)}catch(e){toast('That file is not a Count It backup')}});
+  case'wipe':if(confirm('Erase every item on this device?')){mark();db.items=[];db.folders=[];db.cur=null;save();closeSheet();render();toast('Everything erased',restore)}return}});
+$('#q').oninput=e=>{q=e.target.value;render()};
+$('#qa').onkeydown=e=>{if(e.key==='Enter')quickAdd()};
 let dp;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#install').hidden=false});
 $('#install').onclick=async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;$('#install').hidden=true};
 window.addEventListener('appinstalled',()=>$('#install').hidden=true);
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
-render();
+applyTheme();render();
 </script></body></html>
